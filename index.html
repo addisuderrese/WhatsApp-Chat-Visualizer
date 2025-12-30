@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Chat Visualizer</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+
+        <!-- Header: Visible in Chat View or potentially always? Let's make it always visible but minimalist in landing -->
+        <header class="chat-header">
+            <div class="header-info">
+                <h1>WhatsApp Chat Visualizer</h1>
+            </div>
+            <div class="header-controls">
+                <button id="newChatBtn" class="icon-btn labeled-btn" aria-label="Upload New Chat" style="display: none;"
+                    title="Open Another Chat">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <polyline points="1 20 1 14 7 14"></polyline>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                    <span>New Chat</span>
+                </button>
+                <button id="themeToggle" class="icon-btn" aria-label="Toggle Dark Mode">
+                    <!-- Sun Icon (for Dark Mode -> switch to Light) -->
+                    <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" style="display: none;">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <!-- Moon Icon (for Light Mode -> switch to Dark) -->
+                    <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Landing View -->
+        <div id="landingView" class="landing-container">
+            <div class="upload-box" id="dropZone">
+                <div class="upload-icon">📂</div>
+                <h2>Upload WhatsApp Chat</h2>
+                <p>Drag & drop your chat folder here, or click to browse</p>
+                <!-- Note: 'directory' attribute is non-standard but needed for folder selection in some browsers, 'webkitdirectory' for others -->
+                <input type="file" id="folderInput" webkitdirectory directory multiple />
+                <label for="folderInput" class="upload-btn-large">Choose Folder</label>
+                <p class="upload-hint">Select the folder containing your <code>.txt</code> file and media.</p>
+            </div>
+
+            <div class="options-container">
+                <h3 class="options-title">Display Options</h3>
+                <div class="options-grid">
+                    <label class="option-toggle">
+                        <input type="checkbox" id="formatToggle">
+                        <span>Use 24-hour format</span>
+                    </label>
+                    <label class="option-toggle">
+                        <input type="checkbox" id="showDateToggle" checked>
+                        <span>Show date separators</span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="privacy-link" id="privacyBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                Privacy & Data Policy
+            </button>
+        </div>
+
+        <!-- Chat View (Hidden by default) -->
+        <main id="chatView" class="chat-view hidden">
+            <div class="chat-container" id="chatContainer">
+                <!-- Messages will be rendered here -->
+            </div>
+        </main>
+
+    </div>
+
+    <!-- Privacy Modal -->
+    <div class="modal-overlay" id="privacyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                    Privacy & Data Policy
+                </h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Your privacy is our priority.</strong></p>
+                <ul class="privacy-list">
+                    <li>
+                        <svg class="check-icon" viewBox="0 0 24 24" width="18" height="18" fill="none"
+                            stroke="currentColor" stroke-width="2.5">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        <span><strong>100% Client-Side Processing</strong> – All data is processed directly in your
+                            browser.</span>
+                    </li>
+                    <li>
+                        <svg class="check-icon" viewBox="0 0 24 24" width="18" height="18" fill="none"
+                            stroke="currentColor" stroke-width="2.5">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        <span><strong>No Data Upload</strong> – Your chat files are never sent to any server.</span>
+                    </li>
+                    <li>
+                        <svg class="check-icon" viewBox="0 0 24 24" width="18" height="18" fill="none"
+                            stroke="currentColor" stroke-width="2.5">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        <span><strong>No Storage</strong> – We do not store, save, or retain any of your messages,
+                            media, or personal information.</span>
+                    </li>
+                    <li>
+                        <svg class="check-icon" viewBox="0 0 24 24" width="18" height="18" fill="none"
+                            stroke="currentColor" stroke-width="2.5">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        <span><strong>No Tracking</strong> – We do not use cookies or analytics to track your
+                            activity.</span>
+                    </li>
+                    <li>
+                        <svg class="check-icon" viewBox="0 0 24 24" width="18" height="18" fill="none"
+                            stroke="currentColor" stroke-width="2.5">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        <span><strong>Open & Transparent</strong> – This tool runs entirely offline once loaded.</span>
+                    </li>
+                </ul>
+                <p class="modal-note">When you close or refresh this page, all loaded data is permanently discarded.</p>
+
+                <a href="https://github.com/AdisuNameworking/whatsapp-chat-visualizer" target="_blank"
+                    rel="noopener noreferrer" class="github-link">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path
+                            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                    </svg>
+                    <span>View on GitHub – Open Source</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
